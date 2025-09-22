@@ -1,42 +1,121 @@
-import { icons } from '@/constants/icons'
-import { Link } from 'expo-router'
-import React from 'react'
-import { Image, Text, TouchableOpacity, View } from 'react-native'
-
-const MovieCard = ({id, poster_path, title, vote_average, release_date}: Movie) => {
-
-
-  return (
-    <Link href={`/movies/${id}`} asChild>
-        <TouchableOpacity className='w-[30%]'>
-            <Image 
-            source={{
-                uri:poster_path ? `https://image.tmdb.org/t/p/w500${poster_path}` : "https://placehold.co/600x400/1a1a1a/FFFFFF.png",
-            }}
-         className='w-full h-52 rounded-lg  '
-         resizeMode='cover'
-         />
-         <Text className='text-sm font-bold text-white mt-2' numberOfLines={1} >{title}</Text>
-         
-         <View className='flex-row items-center justify-start gap-x-1' >
-            <Image source={icons.star} className='size-4' />
-            <Text className='text-xs text-white font-bold uppercase'>{Math.round(vote_average / 2)}</Text>
-         </View>
-
-        <View className='flex-row items-center justify-between'>
-            <Text className='text-xs text-light-300'>
-                {release_date?.split('-')[0]}
-            </Text>
-             <Text className='text-xs font-medium text-light-300 uppercase'>
-                Movie
-            </Text> 
-            
-        </View>
+import { icons } from '@/constants/icons';
+import { useUser } from '@/contexts/UserContext';
+import { isMovieSaved, saveMovie, unsaveMovie } from '@/services/appwrite';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 
 
-        </TouchableOpacity>
-    </Link>
-  )
+interface MovieCardProps {
+  id: number;
+  title: string;
+  poster_path: string;
+  overview?: string;
+  release_date?: string;
+  vote_average?: number;
 }
 
-export default MovieCard
+const MovieCard: React.FC<MovieCardProps> = ({ 
+  id, 
+  title, 
+  poster_path, 
+  overview = '',
+  release_date = '',
+  vote_average = 0
+}) => {
+  const router = useRouter();
+  const { user } = useUser();
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    checkIfSaved();
+  }, [id, user]);
+
+  const checkIfSaved = async () => {
+    if (!user) {
+      setSaved(false);
+      return;
+    }
+
+    try {
+      const isSaved = await isMovieSaved(id);
+      setSaved(isSaved);
+    } catch (error) {
+      console.error('Error checking saved status:', error);
+    }
+  };
+
+  const handleSavePress = async () => {
+    if (!user) {
+      Alert.alert('Login Required', 'Please log in to save movies');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (saved) {
+        await unsaveMovie(id);
+        setSaved(false);
+      } else {
+        await saveMovie({
+          id,
+          title,
+          poster_path,
+          overview,
+          release_date,
+          vote_average,
+          // Add other required Movie properties
+          adult: false,
+          backdrop_path: '',
+          genre_ids: [],
+          original_language: 'en',
+          original_title: title,
+          popularity: 0,
+          video: false,
+          vote_count: 0,
+        });
+        setSaved(true);
+      }
+    } catch (error) {
+      console.error('Error toggling save:', error);
+      Alert.alert('Error', 'Failed to save movie');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <View className="w-[100px] mb-4">
+      <TouchableOpacity 
+        onPress={() => router.push(`/movies/${id}`)} 
+        className="relative"
+      >
+        <Image
+          source={{ uri: `https://image.tmdb.org/t/p/w500${poster_path}` }}
+          className="w-full h-[150px] rounded-lg"
+          resizeMode="cover"
+        />
+        <TouchableOpacity
+          onPress={handleSavePress}
+          disabled={loading}
+          className="absolute -top-1 right-1 bg-dark-100/80 rounded-full p-1"
+        >
+          <Image
+            source={saved ? icons.heartFilled : icons.heartOutline}
+            className="w-6 h-6"
+            tintColor={saved ? "#ff0000" : "#ffffff"}
+          />
+        </TouchableOpacity>
+      </TouchableOpacity>
+      <Text 
+        className="text-white text-xs mt-2 font-semibold" 
+        numberOfLines={2}
+      >
+        {title}
+      </Text>
+    </View>
+  );
+};
+
+export default MovieCard;
