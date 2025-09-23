@@ -38,19 +38,19 @@ const SavedScreen = () => {
             data={savedMovies}
             renderItem={({ item }) => (
               <MovieCard 
-                id={item.id}
+                id={item.movie_id} // TMDB movie ID
                 title={item.title}
-                poster_path={item.poster_url.replace('https://image.tmdb.org/t/p/w500', '')}
+                poster_path={item.poster_url ? item.poster_url.replace('https://image.tmdb.org/t/p/w500', '') : ''}
                 overview={item.overview}
                 release_date={item.release_date}
                 vote_average={item.vote_average}
               />
             )}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) => item.$id ?? index.toString()} // fallback if $id missing
             numColumns={3}
             columnWrapperStyle={{
               justifyContent: 'flex-start',
-              gap: 20,
+              gap: 16,
               paddingRight: 5,
               marginBottom: 10
             }}
