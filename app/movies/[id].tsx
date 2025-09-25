@@ -151,7 +151,7 @@ const Details = () => {
         <TouchableWithoutFeedback onPress={() => setStreamModalVisible(false)}>
           <View className="flex-1 justify-end bg-black/50">
             <TouchableWithoutFeedback>
-              <View className="bg-dark-100 rounded-t-3xl p-5 max-h-1/2">
+              <SafeAreaView edges={["bottom"]} className="bg-dark-100 rounded-t-3xl p-5 max-h-1/2">
                 <Text className="text-white font-bold text-lg mb-4 text-center">
                   Select Streaming Source
                 </Text>
@@ -175,7 +175,7 @@ const Details = () => {
                     <Text className="text-light-200 text-center">No streaming sources available</Text>
                   )}
                 </ScrollView>
-              </View>
+              </SafeAreaView>
             </TouchableWithoutFeedback>
           </View>
         </TouchableWithoutFeedback>
@@ -189,7 +189,7 @@ const Details = () => {
         onRequestClose={closeStream}
         supportedOrientations={["landscape", "portrait"]}
       >
-        <View className="flex-1 bg-black">
+        <SafeAreaView edges={["bottom"]} className="flex-1 bg-black">
           <TouchableOpacity
             className="absolute top-5 right-5 z-10 bg-dark-100 rounded-full p-2"
             onPress={closeStream}
@@ -230,13 +230,13 @@ const Details = () => {
               }}
             />
           )}
-        </View>
+        </SafeAreaView>
       </Modal>
 
       {/* Go Back Button */}
       <TouchableOpacity
         className="absolute bottom-5 left-0 right-0 mx-5 bg-accent rounded-lg py-3.5 flex flex-row items-center justify-center z-50"
-        style={{ marginBottom: Platform.OS === "android" ? 20 : 0 }}
+        style={{ marginBottom: Platform.OS === "android" ? 30 : 0 }}
         onPress={router.back}
       >
         <Image source={icons.arrow} className="size-5 mr-1 mt-0.5 rotate-180" tintColor="#fff" />

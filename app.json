@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Filmomat",
-    "slug": "mobile_movie_app",
+    "slug": "mobilemovieapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/logo.png",
@@ -48,8 +48,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "b3227006-df75-4255-af18-92bbe2104360"
+        "projectId": "e0315b39-14da-4927-a9d5-735bdfdb9a8c"
       }
-    }
+    },
+    "owner": "veljko_scg"
   }
 }

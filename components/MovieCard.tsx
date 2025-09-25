@@ -65,15 +65,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
           overview,
           release_date,
           vote_average,
-          // Add other required Movie properties
-          adult: false,
-          backdrop_path: '',
-          genre_ids: [],
-          original_language: 'en',
-          original_title: title,
-          popularity: 0,
-          video: false,
-          vote_count: 0,
+          
         });
         setSaved(true);
       }

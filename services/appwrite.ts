@@ -55,6 +55,37 @@ const getUserId = async (): Promise<string> => {
   }
 };
 
+// ---------------- REAL-TIME SUBSCRIPTIONS ----------------
+interface SavedMoviePayload {
+  userId: string;
+  movie_id: number;
+  title: string;
+  poster_url: string | null;
+  overview: string;
+  release_date: string;
+  vote_average: number;
+  savedAt: string;
+  deviceId: string;
+}
+
+export const subscribeToUserSavedMovies = (
+  userId: string,
+  callback: (payload: SavedMoviePayload) => void
+): (() => void) => {
+  const unsubscribe = client.subscribe(
+    `databases.${DATABASE_ID}.collections.${SAVED_COLLECTION_ID}.documents`,
+    (response) => {
+      const payload = response.payload as SavedMoviePayload; // type assertion
+      if (payload.userId === userId) {
+        callback(payload);
+      }
+    }
+  );
+
+  return unsubscribe;
+};
+
+
 // ---------------- TRENDING MOVIES ----------------
 export const updateSearchCount = async (query: string, movie: Movie): Promise<void> => {
   try {
